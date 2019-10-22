@@ -1,5 +1,7 @@
 package com.apple.repository;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -11,14 +13,18 @@ import com.apple.repository.crud.AuthorRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class ArticleRepositoryFacadeTest {
 
+    private static final Long ARTICLE_ID = 1L;
     private static final Long AUTHOR_ID = 122L;
     private static final String TITLE = "The Most Important Question of Your Life";
+    private static final String SUMMARY = "summary";
+    private static final String TEXT = "TBD";
 
     @Mock
     private ArticleRepository articleRepository;
@@ -52,6 +58,54 @@ public class ArticleRepositoryFacadeTest {
         assertEquals(target.getTitle(), TITLE);
         assertNotNull(target.getAuthor());
         assertEquals(target.getAuthor().getId(), AUTHOR_ID);
+    }
+
+    @Test
+    public void shouldUpdateTitle() {
+        com.apple.repository.model.Article modelArticle = new com.apple.repository.model.Article(TITLE, null, null, null);
+        Article domainArticle = new Article(ARTICLE_ID, TITLE, null, null, null, null, null);
+
+        when(articleRepository.findById(eq(ARTICLE_ID))).thenReturn(Optional.of(modelArticle));
+        when(articleConverter.convert(eq(modelArticle))).thenReturn(domainArticle);
+        when(articleRepository.save(eq(modelArticle))).thenReturn(modelArticle);
+
+        Optional<Article> target = victim.updateTitle(ARTICLE_ID, TITLE);
+
+        assertTrue(target.isPresent());
+        assertEquals(target.get().getId(), ARTICLE_ID);
+        assertEquals(target.get().getTitle(), TITLE);
+    }
+
+    @Test
+    public void shouldUpdateText() {
+        com.apple.repository.model.Article modelArticle = new com.apple.repository.model.Article(null, null, TEXT, null);
+        Article domainArticle = new Article(ARTICLE_ID, null, null, TEXT, null, null, null);
+
+        when(articleRepository.findById(eq(ARTICLE_ID))).thenReturn(Optional.of(modelArticle));
+        when(articleConverter.convert(eq(modelArticle))).thenReturn(domainArticle);
+        when(articleRepository.save(eq(modelArticle))).thenReturn(modelArticle);
+
+        Optional<Article> target = victim.updateText(ARTICLE_ID, TEXT);
+
+        assertTrue(target.isPresent());
+        assertEquals(target.get().getId(), ARTICLE_ID);
+        assertEquals(target.get().getText(), TEXT);
+    }
+
+    @Test
+    public void shouldUpdateSummary() {
+        com.apple.repository.model.Article modelArticle = new com.apple.repository.model.Article(null, SUMMARY, null, null);
+        Article domainArticle = new Article(ARTICLE_ID, null, SUMMARY, null, null, null, null);
+
+        when(articleRepository.findById(eq(ARTICLE_ID))).thenReturn(Optional.of(modelArticle));
+        when(articleConverter.convert(eq(modelArticle))).thenReturn(domainArticle);
+        when(articleRepository.save(eq(modelArticle))).thenReturn(modelArticle);
+
+        Optional<Article> target = victim.updateSummary(ARTICLE_ID, SUMMARY);
+
+        assertTrue(target.isPresent());
+        assertEquals(target.get().getId(), ARTICLE_ID);
+        assertEquals(target.get().getSummary(), SUMMARY);
     }
 
 }
