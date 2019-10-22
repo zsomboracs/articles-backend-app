@@ -1,6 +1,7 @@
 package com.apple.domain;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 public class Article {
 
@@ -48,5 +49,24 @@ public class Article {
 
     public Author getAuthor() {
         return author;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Article article = (Article) o;
+        return Objects.equals(id, article.id) &&
+                Objects.equals(title, article.title) &&
+                Objects.equals(summary, article.summary) &&
+                Objects.equals(text, article.text) &&
+                Objects.equals(createDate, article.createDate) &&
+                Objects.equals(modifyDate, article.modifyDate) &&
+                Objects.equals(author, article.author);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, summary, text, createDate, modifyDate, author);
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import com.apple.service.exception.BadRequestException;
 
 @RestControllerAdvice
 public class ExceptionHandler {
@@ -15,7 +16,10 @@ public class ExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(ExceptionHandler.class);
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @org.springframework.web.bind.annotation.ExceptionHandler({IllegalArgumentException.class, MissingServletRequestParameterException.class})
+    @org.springframework.web.bind.annotation.ExceptionHandler({
+            BadRequestException.class,
+            IllegalArgumentException.class,
+            MissingServletRequestParameterException.class})
     protected ErrorMessage handleBadRequests(final Exception ex, final WebRequest request) {
         LOGGER.warn("operation=handleBadRequests, error={}", ex.getMessage());
 
