@@ -1,0 +1,5 @@
+insert into author (id, first_name, last_name) values (1, 'Tamara', 'Xenokrates')
+insert into author (id, first_name, last_name) values (2, 'Bridget', 'Oluwaseun')
+insert into author (id, first_name, last_name) values (3, 'Kapel', 'Cleitus')
+insert into author (id, first_name, last_name) values (4, 'Tryggvi', 'Leonidas')
+insert into author (id, first_name, last_name) values (5, 'Lugh', 'Kiran')

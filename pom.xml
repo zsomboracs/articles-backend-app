@@ -23,6 +23,9 @@
 
 	<properties>
 		<java.version>11</java.version>
+		<javax.inject.version>1</javax.inject.version>
+		<guava.version>28.0-jre</guava.version>
+		<hibernate.version>5.4.6.Final</hibernate.version>
 	</properties>
 
 	<dependencies>
@@ -50,6 +53,22 @@
 					<artifactId>junit-vintage-engine</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.inject</groupId>
+			<artifactId>javax.inject</artifactId>
+			<version>${javax.inject.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>${guava.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-java8</artifactId>
+			<version>${hibernate.version}</version>
 		</dependency>
 	</dependencies>
 
