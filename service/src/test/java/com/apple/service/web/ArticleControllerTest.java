@@ -1,21 +1,32 @@
 package com.apple.service.web;
 
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import com.apple.api.response.Article;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import com.apple.api.request.SaveArticle;
+import com.apple.api.request.UpdateArticle;
 import com.apple.service.business.ArticleService;
 import com.apple.service.converter.Domain2ApiArticleConverter;
+import com.apple.service.exception.BadRequestException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 public class ArticleControllerTest {
 
+    private static final Long ARTICLE_ID = 12L;
     private static final String TITLE = "The Most Important Question of Your Life";
+    private static final String SUMMARY = "Best post to start with to understand the underlying philosophy of my work.";
+    private static final String TEXT = "TBD";
 
     @Mock
     private ArticleService articleService;
@@ -37,10 +48,55 @@ public class ArticleControllerTest {
         com.apple.domain.Article domainArticle = new com.apple.domain.Article(null, TITLE, null, null, null, null, null);
 
         when(articleService.save(eq(TITLE), any(), any(), any())).thenReturn(domainArticle);
-        when(articleConverter.convert(eq(domainArticle))).thenReturn(new Article(null, TITLE, null, null, null, null, null));
+        when(articleConverter.convert(eq(domainArticle))).thenReturn(new com.apple.api.response.Article(null, TITLE, null, null, null, null, null));
 
-        Article target = victim.article(new com.apple.api.request.Article(TITLE, null, null, null));
+        com.apple.api.response.Article target = victim.article(new SaveArticle(TITLE, null, null, null));
 
         assertEquals(target.getTitle(), TITLE);
     }
+
+    @Test
+    public void shouldUpdateTitle() {
+        ResponseEntity<Void> target = victim.partialUpdate(ARTICLE_ID, new UpdateArticle(TITLE, null, null));
+
+        verify(articleService).updateTitle(eq(ARTICLE_ID), eq(TITLE));
+        assertEquals(target.getStatusCode(), HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    public void shouldUpdateText() {
+        ResponseEntity<Void> target = victim.partialUpdate(ARTICLE_ID, new UpdateArticle(null, null, TEXT));
+
+        verify(articleService).updateText(eq(ARTICLE_ID), eq(TEXT));
+        assertEquals(target.getStatusCode(), HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    public void shouldUpdateSummary() {
+        ResponseEntity<Void> target = victim.partialUpdate(ARTICLE_ID, new UpdateArticle(null, SUMMARY, null));
+
+        verify(articleService).updateSummary(eq(ARTICLE_ID), eq(SUMMARY));
+        assertEquals(target.getStatusCode(), HttpStatus.NO_CONTENT);
+    }
+
+    @Test
+    public void shouldThrowBadRequestExceptionIfMoreThan1ParameterDefined() {
+
+        Throwable exception = assertThrows(
+                BadRequestException.class,
+                () -> victim.partialUpdate(ARTICLE_ID, new UpdateArticle(TITLE, TEXT, SUMMARY)));
+
+        assertEquals("Only one property at the time is updatable", exception.getMessage());
+    }
+
+    @Test
+    public void shouldThrowBadRequestExceptionIfMoreLess1ParameterDefined() {
+
+        Throwable exception = assertThrows(
+                BadRequestException.class,
+                () -> victim.partialUpdate(ARTICLE_ID, new UpdateArticle(null, null, null)));
+
+        assertEquals("Only one property at the time is updatable", exception.getMessage());
+    }
+
 }
