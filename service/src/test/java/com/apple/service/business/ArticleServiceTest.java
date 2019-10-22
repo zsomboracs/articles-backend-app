@@ -1,5 +1,6 @@
 package com.apple.service.business;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,7 @@ public class ArticleServiceTest {
     private static final Long AUTHOR_ID = 122L;
     private static final Long ARTICLE_ID = 12L;
     private static final String TITLE = "The Most Important Question of Your Life";
+    private static final String TITLE_2 = "The Most Important Question of Your Life 2";
     private static final String SUMMARY = "summary";
     private static final String TEXT = "TBD";
 
@@ -96,6 +98,18 @@ public class ArticleServiceTest {
         assertEquals(target.getText(), TEXT);
         assertNotNull(target.getAuthor());
         assertEquals(target.getAuthor().getId(), AUTHOR_ID);
+    }
+
+    @Test
+    public void shouldReturnArticles() {
+        Article domainArticle1 = new Article(null, TITLE, null, null, null, null, null);
+        Article domainArticle2 = new Article(null, TITLE_2, null, null, null, null, null);
+
+        when(articleRepositoryFacade.articles()).thenReturn(List.of(domainArticle1, domainArticle2));
+
+        List<Article> target = victim.articles();
+
+        assertEquals(target, List.of(domainArticle1, domainArticle2));
     }
 
     @Test

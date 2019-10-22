@@ -1,5 +1,6 @@
 package com.apple.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +24,7 @@ public class ArticleRepositoryFacadeTest {
     private static final Long ARTICLE_ID = 1L;
     private static final Long AUTHOR_ID = 122L;
     private static final String TITLE = "The Most Important Question of Your Life";
+    private static final String TITLE_2 = "The Most Important Question of Your Life 2";
     private static final String SUMMARY = "summary";
     private static final String TEXT = "TBD";
 
@@ -58,6 +60,23 @@ public class ArticleRepositoryFacadeTest {
         assertEquals(target.getTitle(), TITLE);
         assertNotNull(target.getAuthor());
         assertEquals(target.getAuthor().getId(), AUTHOR_ID);
+    }
+
+    @Test
+    public void shouldReturnArticles() {
+        com.apple.repository.model.Article modelArticle1 = new com.apple.repository.model.Article(TITLE, null, null, null);
+        com.apple.repository.model.Article modelArticle2 = new com.apple.repository.model.Article(TITLE_2, null, null, null);
+
+        Article domainArticle1 = new Article(null, TITLE, null, null, null, null, null);
+        Article domainArticle2 = new Article(null, TITLE_2, null, null, null, null, null);
+
+        when(articleRepository.findByOrderByTitleAsc()).thenReturn(List.of(modelArticle1, modelArticle2));
+        when(articleConverter.convert(eq(modelArticle1))).thenReturn(domainArticle1);
+        when(articleConverter.convert(eq(modelArticle2))).thenReturn(domainArticle2);
+
+        List<Article> target = victim.articles();
+
+        assertEquals(target, List.of(domainArticle1, domainArticle2));
     }
 
     @Test

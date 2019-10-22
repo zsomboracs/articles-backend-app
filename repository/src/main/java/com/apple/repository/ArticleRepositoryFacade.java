@@ -1,6 +1,8 @@
 package com.apple.repository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 import org.springframework.stereotype.Repository;
@@ -28,6 +30,13 @@ public class ArticleRepositoryFacade {
         Author author = authorRepository.getOne(authorId);
         com.apple.repository.model.Article article = new com.apple.repository.model.Article(title, text, summary, author);
         return articleConverter.convert(articleRepository.saveAndFlush(article));
+    }
+
+    public List<Article> articles() {
+        return articleRepository.findByOrderByTitleAsc()
+                .stream()
+                .map(articleConverter::convert)
+                .collect(Collectors.toList());
     }
 
     public Optional<Article> updateTitle(Long id, String newTitle) {

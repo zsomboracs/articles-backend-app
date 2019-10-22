@@ -1,5 +1,6 @@
 package com.apple.service.business;
 
+import java.util.List;
 import javax.inject.Inject;
 
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -42,6 +43,10 @@ public class ArticleService {
         return articleRepositoryFacade.save(title, text, summary, authorId);
     }
 
+    public List<Article> articles() {
+        return articleRepositoryFacade.articles();
+    }
+
     @Transactional
     public void updateTitle(Long id, String newTitle) {
         articleRepositoryFacade.updateTitle(id, newTitle).orElseThrow(
@@ -68,4 +73,5 @@ public class ArticleService {
             throw new BadRequestException(SHOULD_BE_EXISTING_ARTICLE_ID);
         }
     }
+
 }

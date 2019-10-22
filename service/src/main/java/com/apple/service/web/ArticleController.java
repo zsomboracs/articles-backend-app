@@ -1,5 +1,7 @@
 package com.apple.service.web;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 
@@ -9,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.apple.api.request.SaveArticle;
 import com.apple.api.request.UpdateArticle;
+import com.apple.api.response.Article;
 import com.apple.service.business.ArticleService;
 import com.apple.service.converter.Domain2ApiArticleConverter;
 import com.apple.service.exception.BadRequestException;
@@ -28,7 +31,7 @@ public class ArticleController {
     }
 
     @PostMapping("/article")
-    public com.apple.api.response.Article article(@RequestBody SaveArticle article) {
+    public Article article(@RequestBody SaveArticle article) {
         return articleConverter.convert(
                 articleService.save(
                         article.getTitle(),
@@ -36,6 +39,15 @@ public class ArticleController {
                         article.getSummary(),
                         article.getAuthorId()));
     }
+
+    @GetMapping("/articles")
+    public List<Article> articles() {
+        return articleService.articles()
+                .stream()
+                .map(articleConverter::convert)
+                .collect(Collectors.toList());
+    }
+
 
     @PatchMapping("/article/{id}")
     public ResponseEntity<Void> partialUpdate(@PathVariable Long id, @RequestBody UpdateArticle article) {
