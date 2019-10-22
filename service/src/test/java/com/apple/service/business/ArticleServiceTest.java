@@ -5,15 +5,18 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.springframework.dao.EmptyResultDataAccessException;
 import com.apple.domain.Article;
 import com.apple.domain.Author;
 import com.apple.repository.ArticleRepositoryFacade;
+import com.apple.repository.crud.ArticleRepository;
 import com.apple.repository.crud.AuthorRepository;
 import com.apple.service.exception.BadRequestException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
@@ -29,6 +32,8 @@ public class ArticleServiceTest {
     @Mock
     private ArticleRepositoryFacade articleRepositoryFacade;
     @Mock
+    private ArticleRepository articleRepository;
+    @Mock
     private AuthorRepository authorRepository;
 
     private ArticleService victim;
@@ -36,7 +41,7 @@ public class ArticleServiceTest {
     @BeforeEach
     public void setUp() {
         initMocks(this);
-        victim = new ArticleService(articleRepositoryFacade, authorRepository);
+        victim = new ArticleService(articleRepositoryFacade, articleRepository, authorRepository);
     }
 
     @Test
@@ -158,6 +163,26 @@ public class ArticleServiceTest {
         Throwable exception = assertThrows(
                 BadRequestException.class,
                 () -> victim.updateSummary(ARTICLE_ID, SUMMARY));
+
+        assertEquals("article id should be an existing article", exception.getMessage());
+    }
+
+    @Test
+    public void shouldDeleteArticle() {
+
+        victim.delete(ARTICLE_ID);
+
+        verify(articleRepository).deleteById(eq(ARTICLE_ID));
+    }
+
+    @Test
+    public void shouldThrowBadRequestExceptionIfArticleDoesNotExistInCaseOfDelete() {
+
+        doThrow(EmptyResultDataAccessException.class).when(articleRepository).deleteById(eq(ARTICLE_ID));
+
+        Throwable exception = assertThrows(
+                BadRequestException.class,
+                () -> victim.delete(ARTICLE_ID));
 
         assertEquals("article id should be an existing article", exception.getMessage());
     }

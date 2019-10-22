@@ -2,6 +2,7 @@ package com.apple.service.business;
 
 import javax.inject.Inject;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.apple.domain.Article;
@@ -15,13 +16,18 @@ import static com.google.common.base.Preconditions.checkArgument;
 @Service
 public class ArticleService {
 
+    private static final String SHOULD_BE_EXISTING_ARTICLE_ID = "article id should be an existing article";
+
     private ArticleRepositoryFacade articleRepositoryFacade;
+    private ArticleRepository articleRepository;
     private AuthorRepository authorRepository;
 
     @Inject
     public ArticleService(ArticleRepositoryFacade articleRepositoryFacade,
+                          ArticleRepository articleRepository,
                           AuthorRepository authorRepository) {
         this.articleRepositoryFacade = articleRepositoryFacade;
+        this.articleRepository = articleRepository;
         this.authorRepository = authorRepository;
     }
 
@@ -39,20 +45,27 @@ public class ArticleService {
     @Transactional
     public void updateTitle(Long id, String newTitle) {
         articleRepositoryFacade.updateTitle(id, newTitle).orElseThrow(
-                () -> new BadRequestException("article id should be an existing article"));
+                () -> new BadRequestException(SHOULD_BE_EXISTING_ARTICLE_ID));
     }
 
     @Transactional
     public void updateText(Long id, String newText) {
         articleRepositoryFacade.updateText(id, newText).orElseThrow(
-                () -> new BadRequestException("article id should be an existing article"));
+                () -> new BadRequestException(SHOULD_BE_EXISTING_ARTICLE_ID));
     }
 
     @Transactional
     public void updateSummary(Long id, String newSummary) {
         articleRepositoryFacade.updateSummary(id, newSummary).orElseThrow(
-                () -> new BadRequestException("article id should be an existing article"));
+                () -> new BadRequestException(SHOULD_BE_EXISTING_ARTICLE_ID));
     }
 
-
+    @Transactional
+    public void delete(Long id) {
+        try {
+            articleRepository.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new BadRequestException(SHOULD_BE_EXISTING_ARTICLE_ID);
+        }
+    }
 }

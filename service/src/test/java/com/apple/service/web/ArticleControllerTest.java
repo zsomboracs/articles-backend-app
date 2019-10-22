@@ -1,7 +1,5 @@
 package com.apple.service.web;
 
-import java.util.Optional;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -97,6 +95,14 @@ public class ArticleControllerTest {
                 () -> victim.partialUpdate(ARTICLE_ID, new UpdateArticle(null, null, null)));
 
         assertEquals("Only one property at the time is updatable", exception.getMessage());
+    }
+
+    @Test
+    public void shouldDeleteArticle() {
+        ResponseEntity<Void> target = victim.delete(ARTICLE_ID);
+
+        verify(articleService).delete(eq(ARTICLE_ID));
+        assertEquals(target.getStatusCode(), HttpStatus.NO_CONTENT);
     }
 
 }
