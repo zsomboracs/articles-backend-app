@@ -5,8 +5,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.apple.api.request.SaveArticle;
@@ -18,8 +16,6 @@ import com.apple.service.exception.BadRequestException;
 
 @RestController
 public class ArticleController {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ArticleController.class);
 
     private ArticleService articleService;
     private Domain2ApiArticleConverter articleConverter;
@@ -40,6 +36,7 @@ public class ArticleController {
                         article.getAuthorId()));
     }
 
+    // TODO introduce pagination with max limit on page size
     @GetMapping("/articles")
     public List<Article> articles() {
         return articleService.articles()
@@ -48,10 +45,9 @@ public class ArticleController {
                 .collect(Collectors.toList());
     }
 
-
+    // TODO in production environment a more sophisticated approach would be better (e.g. application/merge-patch+json with JSON-P)
     @PatchMapping("/article/{id}")
     public ResponseEntity<Void> partialUpdate(@PathVariable Long id, @RequestBody UpdateArticle article) {
-
         if (Stream.of(article.getText(), article.getSummary(), article.getTitle())
                 .filter(field -> field != null)
                 .count() != 1) {
