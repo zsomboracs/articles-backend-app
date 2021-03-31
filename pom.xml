@@ -24,7 +24,7 @@
 	<properties>
 		<java.version>11</java.version>
 		<javax.inject.version>1</javax.inject.version>
-		<guava.version>28.0-jre</guava.version>
+		<guava.version>29.0-jre</guava.version>
 		<hibernate.version>5.4.6.Final</hibernate.version>
 		<swagger.version>2.9.2</swagger.version>
 	</properties>
